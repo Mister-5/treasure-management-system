@@ -570,7 +570,7 @@ export default function App() {
 
         {/* Mobile slide drawer */}
         {mobileMenuOpen && (
-          <div className="fixed inset-0 z-50 flex lg:hidden bg-slate-950/80 backdrop-blur-xs transition" id="mobile-overlay font-sans">
+          <div className="fixed inset-0 z-50 flex lg:hidden bg-slate-950/80 backdrop-blur-xs transition font-sans" id="mobile-overlay">
             <div className="w-64 bg-slate-900 text-white min-h-screen p-0 flex flex-col justify-between">
               <div className="flex flex-col flex-1">
                 <div className="p-6 flex flex-col items-center justify-center border-b border-slate-800 relative">

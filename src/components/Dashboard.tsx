@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -27,6 +27,19 @@ interface DashboardProps {
 
 export default function Dashboard({ balances, incomes, expenses, cashbook }: DashboardProps) {
   const [timeRange, setTimeRange] = useState<'30' | '90' | '365'>('30');
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [chartWidth, setChartWidth] = useState<number>(600);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      if (entries && entries.length > 0) {
+        setChartWidth(entries[0].contentRect.width);
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   // Compute monthly summation trends for the custom SVG high-contrast charts
   const chartData = useMemo(() => {
@@ -233,7 +246,7 @@ export default function Dashboard({ balances, incomes, expenses, cashbook }: Das
             </div>
  
             {/* Custom Responsive SVG Chart Grid */}
-            <div className="w-full h-64 mt-4 relative">
+            <div ref={containerRef} className="w-full h-64 mt-4 relative">
               <svg className="w-full h-full overflow-visible" id="dashboard-svg-chart">
                 {/* Horizontal Guide Lines */}
                 {[0, 0.25, 0.5, 0.75, 1].map((ratio, index) => {
@@ -241,7 +254,7 @@ export default function Dashboard({ balances, incomes, expenses, cashbook }: Das
                   const value = Math.round(maxChartValue * (1 - ratio));
                   return (
                     <g key={index}>
-                      <line x1="45" y1={y} x2="100%" y2={y} stroke="#e2e8f0" strokeWidth="1" className="stroke-slate-200 dark:stroke-slate-800" strokeDasharray="3,3" />
+                      <line x1="55" y1={y} x2={chartWidth} y2={y} stroke="#e2e8f0" strokeWidth="1" className="stroke-slate-200 dark:stroke-slate-800" strokeDasharray="3,3" />
                       <text x="0" y={y + 4} className="text-[10px] font-bold text-slate-450 dark:text-slate-500 fill-current">
                         {value > 1000 ? `${(value/1000).toFixed(0)}k` : value} Rwf
                       </text>
@@ -251,9 +264,14 @@ export default function Dashboard({ balances, incomes, expenses, cashbook }: Das
 
                 {/* Draw Columns for each month */}
                 {chartData.map((data, idx) => {
-                  const colWidth = 40;
-                  const gap = 16;
-                  const startX = 55 + idx * (colWidth + gap);
+                  const offsetLeft = chartWidth < 450 ? 40 : 55;
+                  const availableWidth = Math.max(chartWidth - offsetLeft - 10, 100);
+                  const slotWidth = availableWidth / 12;
+                  
+                  const barWidth = Math.max(slotWidth * 0.35, 2);
+                  const barGap = Math.max(slotWidth * 0.05, 1);
+                  
+                  const startX = offsetLeft + idx * slotWidth;
 
                   // Calculate heights
                   const incHeight = (data.income / maxChartValue) * 180;
@@ -263,13 +281,16 @@ export default function Dashboard({ balances, incomes, expenses, cashbook }: Das
                   const incY = 210 - incHeight;
                   const expY = 210 - expHeight;
 
+                  const isNarrow = chartWidth < 480;
+                  const labelText = isNarrow ? data.month[0] : data.month;
+
                   return (
                     <g key={idx} className="group cursor-pointer">
                       {/* Income Bar (Left side of slice using theme primary blue) */}
                       <rect 
                         x={startX} 
                         y={incY} 
-                        width="14" 
+                        width={barWidth} 
                         height={Math.max(incHeight, 2)} 
                         rx="3" 
                         className="fill-blue-600 hover:fill-blue-700 transition-colors duration-150"
@@ -277,9 +298,9 @@ export default function Dashboard({ balances, incomes, expenses, cashbook }: Das
                       />
                       {/* Expense Bar (Right side of slice) */}
                       <rect 
-                        x={startX + 16} 
+                        x={startX + barWidth + barGap} 
                         y={expY} 
-                        width="14" 
+                        width={barWidth} 
                         height={Math.max(expHeight, 2)} 
                         rx="3" 
                         className="fill-slate-400 hover:fill-slate-500 dark:fill-slate-600 dark:hover:fill-slate-500 transition-colors duration-150"
@@ -288,12 +309,12 @@ export default function Dashboard({ balances, incomes, expenses, cashbook }: Das
                       
                       {/* Month Text */}
                       <text 
-                        x={startX + 15} 
+                        x={startX + barWidth + barGap / 2} 
                         y="230" 
-                        className="text-[10px] font-bold text-slate-500 dark:text-slate-400 fill-current text-center" 
+                        className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 fill-current text-center" 
                         textAnchor="middle"
                       >
-                        {data.month}
+                        {labelText}
                       </text>
 
                       {/* Tooltip Hover Overlay */}

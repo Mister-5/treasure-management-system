@@ -212,23 +212,23 @@ export default function ReportsGenerator({
     <div className="space-y-6" id="reports-root">
       
       {/* Upper Options */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-xs print:hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs print:hidden">
         <div>
-          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2"><FileText className="text-indigo-600" size={20} /> Corporate Financial Audit Centre</h2>
-          <p className="text-xs text-slate-500">Filter, query, review, and export general cashbooks and church project balance sheets</p>
+          <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><FileText className="text-indigo-600 dark:text-indigo-400" size={20} /> Corporate Financial Audit Centre</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Filter, query, review, and export general cashbooks and church project balance sheets</p>
         </div>
 
         <div className="flex flex-wrap gap-2 text-xs">
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 px-4 rounded-xl transition cursor-pointer"
+            className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-2.5 px-4 rounded-xl transition cursor-pointer"
             id="btn-export-csv"
           >
             <Download size={14} /> Export CSV
           </button>
           <button
             onClick={handleExportExcel}
-            className="flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-100 font-bold py-2.5 px-4 rounded-xl transition cursor-pointer"
+            className="flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900 font-bold py-2.5 px-4 rounded-xl transition cursor-pointer"
             id="btn-export-excel"
           >
             <FileSpreadsheet size={14} /> Download Excel
@@ -244,9 +244,9 @@ export default function ReportsGenerator({
       </div>
 
       {/* Query Matrix Controller */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 bg-white p-5 border border-slate-100 rounded-2xl shadow-xs print:hidden">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 bg-white dark:bg-slate-900 p-5 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-xs print:hidden">
         <div>
-          <label className="block text-xs font-bold text-slate-600 mb-1.5 flex items-center gap-1"><Layers size={13} /> Select Target Ledger</label>
+          <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1"><Layers size={13} /> Select Target Ledger</label>
           <div className="grid grid-cols-2 sm:grid-cols-5 md:grid-cols-1 gap-1.5">
             {[
               { id: 'income', name: 'Income Collections' },
@@ -261,7 +261,7 @@ export default function ReportsGenerator({
                 className={`text-xs font-extrabold text-left py-2 px-3 rounded-xl border transition ${
                   reportType === col.id 
                     ? "bg-indigo-600 text-white border-indigo-500 shadow-sm" 
-                    : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                    : "bg-slate-50 dark:bg-slate-850 text-slate-600 dark:text-slate-350 border-slate-200 dark:border-slate-750 hover:bg-slate-100 dark:hover:bg-slate-800"
                 }`}
               >
                 {col.name}
@@ -271,8 +271,8 @@ export default function ReportsGenerator({
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-slate-600 mb-1.5 flex items-center gap-1"><Calendar size={13} /> Selected Interval Timespan</label>
-          <div className="space-y-1.5 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+          <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1"><Calendar size={13} /> Selected Interval Timespan</label>
+          <div className="space-y-1.5 bg-slate-50 dark:bg-slate-850 p-4 rounded-2xl border border-slate-200 dark:border-slate-750">
             {[
               { id: 'daily', name: "Today's Ledger Entries" },
               { id: 'weekly', name: "Trailing 7 Days Summary" },
@@ -280,7 +280,7 @@ export default function ReportsGenerator({
               { id: 'yearly', name: "Calendar Year Postings" },
               { id: 'all', name: "Complete Archive Logs" }
             ].map(col => (
-              <label key={col.id} className="flex className-radio-label items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+              <label key={col.id} className="flex className-radio-label items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
                 <input
                   type="radio"
                   name="reportScope"
@@ -295,66 +295,66 @@ export default function ReportsGenerator({
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-slate-600 mb-1.5 flex items-center gap-1"><RefreshCw size={13} /> Target Audit Period Year</label>
+          <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1"><RefreshCw size={13} /> Target Audit Period Year</label>
           <select
             value={specificYear}
             onChange={(e) => setSpecificYear(e.target.value)}
-            className="w-full text-xs bg-slate-50 border border-slate-200 text-slate-700 rounded-xl py-2 px-3 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-extrabold"
+            className="w-full text-xs bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-750 text-slate-700 dark:text-slate-200 rounded-xl py-2 px-3 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-extrabold"
           >
             <option value="2026">Fiscal Year 2026</option>
             <option value="2025">Fiscal Year 2025</option>
             <option value="2024">Fiscal Year 2024</option>
           </select>
 
-          <div className="mt-5 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 flex gap-2.5 text-emerald-800 text-xs font-medium">
-            <Sparkles size={25} className="shrink-0 text-emerald-600" />
+          <div className="mt-5 p-4 bg-emerald-50 dark:bg-emerald-950/20 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 flex gap-2.5 text-emerald-800 dark:text-emerald-400 text-xs font-medium">
+            <Sparkles size={25} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
             <div>
               <h5 className="font-bold">Real-time Compliance Sync</h5>
-              <p className="text-[10px] text-emerald-700/80 mt-0.5">Report sheets dynamically consolidate based on underlying cashbook balances.</p>
+              <p className="text-[10px] text-emerald-700/85 dark:text-emerald-400/80 mt-0.5">Report sheets dynamically consolidate based on underlying cashbook balances.</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Visual Sheets Render Printable Layout */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-6 sm:p-8 shadow-xs flex flex-col justify-between print:border-none print:shadow-none print:p-0" id="report-printable-sheet">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 sm:p-8 shadow-xs flex flex-col justify-between print:border-none print:shadow-none print:p-0" id="report-printable-sheet">
         {/* Printable Header block */}
-        <div className="border-b-2 border-slate-900 pb-5 mb-6 flex justify-between items-start">
+        <div className="border-b-2 border-slate-900 dark:border-slate-100 pb-5 mb-6 flex justify-between items-start">
           <div>
-            <span className="text-[10px] font-black tracking-widest text-indigo-600 block uppercase">CHURCH OF LIGHT & HARMONY</span>
-            <h3 className="text-xl font-bold text-slate-800">Financial Audit Certificate Statement</h3>
-            <p className="text-xs text-slate-500 mt-1">
-              General accounts matching report: <span className="font-extrabold text-slate-700 uppercase">{reportType}</span> | scope: <span className="font-extrabold text-slate-700 uppercase">{dateScope}</span> ({specificYear})
+            <span className="text-[10px] font-black tracking-widest text-indigo-600 dark:text-indigo-400 block uppercase">CHURCH OF LIGHT & HARMONY</span>
+            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-150">Financial Audit Certificate Statement</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              General accounts matching report: <span className="font-extrabold text-slate-755 dark:text-slate-300 uppercase">{reportType}</span> | scope: <span className="font-extrabold text-slate-755 dark:text-slate-300 uppercase">{dateScope}</span> ({specificYear})
             </p>
           </div>
-          <div className="text-right font-mono text-[10px] text-slate-400">
+          <div className="text-right font-mono text-[10px] text-slate-450 dark:text-slate-500">
             <p>Generated: {new Date().toISOString().substring(0, 10)}</p>
             <p>Doc Ref: SH-{reportType.substring(0, 3).toUpperCase()}-{dateScope.toUpperCase()}</p>
           </div>
         </div>
 
         {/* Dynamic Items list */}
-        <div className="overflow-x-auto rounded-xl border border-slate-100 print:overflow-visible print:border-none">
+        <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800 print:overflow-visible print:border-none">
           <table className="w-full text-left font-sans text-xs">
             <thead>
-              <tr className="bg-slate-50 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+              <tr className="bg-slate-50 dark:bg-slate-850 text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-850">
                 {computedRows.headers.map((head, idx) => (
                   <th key={idx} className="py-3.5 px-4 font-bold">{head}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-150 text-slate-705">
+            <tbody className="divide-y divide-slate-150 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
               {computedRows.rows.length === 0 ? (
                 <tr>
-                  <td colSpan={computedRows.headers.length} className="py-12 text-center text-slate-400 font-medium">
+                  <td colSpan={computedRows.headers.length} className="py-12 text-center text-slate-400 dark:text-slate-550 font-medium">
                     No matching transaction journal logs located within selected date scopes.
                   </td>
                 </tr>
               ) : (
                 computedRows.rows.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/20 transition">
+                  <tr key={idx} className="hover:bg-slate-50/20 dark:hover:bg-slate-850/20 transition">
                     {row.map((cell, cidx) => (
-                      <td key={cidx} className={`py-3 px-4 ${cidx === row.length - 1 ? "font-bold text-slate-900 text-right" : ""}`}>
+                      <td key={cidx} className={`py-3 px-4 ${cidx === row.length - 1 ? "font-bold text-slate-950 dark:text-white text-right" : ""}`}>
                         {cell}
                       </td>
                     ))}
@@ -367,19 +367,19 @@ export default function ReportsGenerator({
 
         {/* Aggregate footer totals */}
         {computedRows.rows.length > 0 && (
-          <div className="mt-8 border-t-2 border-slate-900 pt-5 flex justify-end">
+          <div className="mt-8 border-t-2 border-slate-900 dark:border-slate-100 pt-5 flex justify-end">
             <div className="text-right space-y-1">
-              <span className="text-[10px] text-slate-400 uppercase font-black block tracking-widest">ledger run-rate net total</span>
-              <h4 className="text-xl font-extrabold text-slate-950 font-mono" id="lbl-report-sum">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-black block tracking-widest">ledger run-rate net total</span>
+              <h4 className="text-xl font-extrabold text-slate-950 dark:text-white font-mono" id="lbl-report-sum">
                 {reportType === 'expense' ? "-" : ""}{Math.abs(computedRows.total).toLocaleString('en-US')} Rwf
               </h4>
-              <p className="text-[10px] text-slate-400 italic">Certificate signature verified by auditing role access gates.</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 italic">Certificate signature verified by auditing role access gates.</p>
             </div>
           </div>
         )}
 
         {/* Print Sign-off boxes */}
-        <div className="hidden print:grid grid-cols-2 gap-10 mt-16 pt-10 border-t border-slate-200 text-xs">
+        <div className="hidden print:grid grid-cols-2 gap-10 mt-16 pt-10 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-705 dark:text-slate-350">
           <div className="text-center">
             <div className="w-48 mx-auto border-b border-slate-400 h-10"></div>
             <p className="font-bold text-slate-700 mt-2">Treasurer Signature & Seal</p>
