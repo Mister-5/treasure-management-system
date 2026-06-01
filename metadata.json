@@ -1,0 +1,6 @@
+{
+  "name": "Church Treasury Management System",
+  "description": "A comprehensive web-based platform for church treasurers to manage finances, including income, expenses, member contributions, pledges, project funds, audit logs, and digital cashbooks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,200 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with role-based access",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["Administrator", "Treasurer", "Pastor", "Secretary", "Auditor"] },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Member": {
+      "title": "Member",
+      "description": "Church member profile",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "fullName": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["fullName", "status"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Income or Expense Category",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["income", "expense"] },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "isCustom": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "type", "status"]
+    },
+    "Income": {
+      "title": "Income",
+      "description": "Recorded income transaction",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "categoryName": { "type": "string" },
+        "memberId": { "type": "string" },
+        "memberName": { "type": "string" },
+        "amount": { "type": "number" },
+        "paymentMethod": { "type": "string", "enum": ["Bank", "Mobile Money", "Cash"] },
+        "date": { "type": "string" },
+        "description": { "type": "string" },
+        "receiptUrl": { "type": "string" },
+        "receiptName": { "type": "string" },
+        "createdBy": { "type": "string" },
+        "createdByName": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "categoryId", "categoryName", "amount", "paymentMethod", "date", "createdBy"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "Recorded expense transaction",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "categoryName": { "type": "string" },
+        "amount": { "type": "number" },
+        "paymentMethod": { "type": "string", "enum": ["Bank", "Mobile Money", "Cash"] },
+        "date": { "type": "string" },
+        "description": { "type": "string" },
+        "projectId": { "type": "string" },
+        "projectName": { "type": "string" },
+        "receiptUrl": { "type": "string" },
+        "receiptName": { "type": "string" },
+        "createdBy": { "type": "string" },
+        "createdByName": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "categoryId", "categoryName", "amount", "paymentMethod", "date", "createdBy"]
+    },
+    "Pledge": {
+      "title": "Pledge",
+      "description": "Church member pledge",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "memberId": { "type": "string" },
+        "memberName": { "type": "string" },
+        "projectId": { "type": "string" },
+        "projectName": { "type": "string" },
+        "amount": { "type": "number" },
+        "amountPaid": { "type": "number" },
+        "remainingBalance": { "type": "number" },
+        "dueDate": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Partially Paid", "Fully Paid", "Overdue"] },
+        "description": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "memberId", "memberName", "amount", "amountPaid", "remainingBalance", "dueDate", "status"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "Church project fund",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "budget": { "type": "number" },
+        "incomeReceived": { "type": "number" },
+        "expensesSpent": { "type": "number" },
+        "remainingBalance": { "type": "number" },
+        "status": { "type": "string", "enum": ["Planning", "Active", "Completed", "Suspended"] },
+        "description": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "budget", "incomeReceived", "expensesSpent", "remainingBalance", "status"]
+    },
+    "Cashbook": {
+      "title": "Cashbook",
+      "description": "Digital cashbook for tracking balances",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["income", "expense"] },
+        "amount": { "type": "number" },
+        "balanceAfter": { "type": "number" },
+        "paymentMethod": { "type": "string", "enum": ["Bank", "Mobile Money", "Cash"] },
+        "referenceId": { "type": "string" },
+        "date": { "type": "string" },
+        "description": { "type": "string" },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "type", "amount", "balanceAfter", "paymentMethod", "referenceId", "date", "createdBy"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "System audit log for transparency",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "action": { "type": "string" },
+        "entityType": { "type": "string" },
+        "entityId": { "type": "string" },
+        "performedBy": { "type": "string" },
+        "performedByName": { "type": "string" },
+        "performedByRole": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "details": { "type": "string" }
+      },
+      "required": ["id", "action", "entityType", "entityId", "performedBy", "performedByName", "performedByRole", "timestamp"]
+    }
+  },
+  "firestore": {
+    "users": {
+      "schema": "User",
+      "description": "User accounts and roles"
+    },
+    "members": {
+      "schema": "Member",
+      "description": "Church members"
+    },
+    "categories": {
+      "schema": "Category",
+      "description": "Income/Expense categories"
+    },
+    "income": {
+      "schema": "Income",
+      "description": "Received Income"
+    },
+    "expenses": {
+      "schema": "Expense",
+      "description": "Church Expenses"
+    },
+    "pledges": {
+      "schema": "Pledge",
+      "description": "Members commitments"
+    },
+    "projects": {
+      "schema": "Project",
+      "description": "Church Projects"
+    },
+    "cashbook": {
+      "schema": "Cashbook",
+      "description": "Running cashbook log"
+    },
+    "auditLogs": {
+      "schema": "AuditLog",
+      "description": "Audit trail"
+    }
+  }
+}

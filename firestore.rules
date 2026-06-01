@@ -1,0 +1,184 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Global Default Deny Gate
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- REUSABLE HARDENED GLOBAL HELPERS ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn();
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Role Fetching Lookups - No token claims dependencies
+    function getUserData(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data;
+    }
+
+    function isRole(role) {
+      return isVerified() && getUserData(request.auth.uid).role == role;
+    }
+
+    // Individual role checks
+    function isAdmin() {
+      return isRole('Administrator');
+    }
+
+    function isTreasurer() {
+      return isRole('Treasurer');
+    }
+
+    function isPastor() {
+      return isRole('Pastor');
+    }
+
+    function isSecretary() {
+      return isRole('Secretary');
+    }
+
+    function isAuditor() {
+      return isRole('Auditor');
+    }
+
+    // --- 2. USERS PROFILE SECURITY ---
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow list: if isVerified() && (isAdmin() || isAuditor() || isTreasurer());
+      
+      // Let creators register themselves but enforce default role limitations 
+      allow create: if isVerified() && userId == request.auth.uid && 
+                       incoming().uid == userId && 
+                       incoming().role == 'Treasurer' && // Default signup role simulation
+                       incoming().status == 'active';
+
+      allow update: if isVerified() && (
+        isAdmin() || 
+        (userId == request.auth.uid && incoming().role == existing().role && incoming().diff(existing()).affectedKeys().hasOnly(['displayName']))
+      );
+      allow delete: if isVerified() && isAdmin();
+    }
+
+    // --- 3. CATEGORIES SCHEMA VALIDATION ---
+    function isValidCategory(data) {
+      return data.keys().hasAll(['id', 'name', 'type', 'status']) && 
+             data.keys().size() <= 6 &&
+             data.id is string && data.id.size() <= 80 &&
+             data.name is string && data.name.size() >= 2 && data.name.size() <= 80 &&
+             data.type in ['income', 'expense'] &&
+             data.status in ['active', 'inactive'];
+    }
+
+    match /categories/{categoryId} {
+      allow read: if isVerified();
+      allow create, update: if isVerified() && (isAdmin() || isTreasurer()) && isValidCategory(incoming()) && isValidId(categoryId);
+      allow delete: if isVerified() && isAdmin() && existing().isCustom == true;
+    }
+
+    // --- 4. MEMBERS INTEGRITY GATES ---
+    function isValidMember(data) {
+      return data.keys().hasAll(['id', 'fullName', 'phone', 'email', 'status', 'createdAt']) && 
+             data.keys().size() <= 8 &&
+             data.id is string && data.id.size() <= 80 &&
+             data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 80 &&
+             data.status in ['active', 'inactive'];
+    }
+
+    match /members/{memberId} {
+      allow read: if isVerified();
+      allow create, update: if isVerified() && (isAdmin() || isTreasurer() || isSecretary()) && isValidMember(incoming()) && isValidId(memberId);
+      allow delete: if isVerified() && (isAdmin() || isTreasurer());
+    }
+
+    // --- 5. INCOMES REGISTRY (Debit collections) ---
+    function isValidIncome(data) {
+      return data.keys().hasAll(['id', 'categoryId', 'categoryName', 'amount', 'paymentMethod', 'date', 'createdBy']) &&
+             data.amount is number && data.amount > 0 &&
+             data.paymentMethod in ['Bank', 'Mobile Money', 'Cash'] &&
+             data.categoryId is string && data.categoryName is string &&
+             data.createdBy is string;
+    }
+
+    match /income/{incomeId} {
+      allow read: if isVerified();
+      allow create: if isVerified() && (isAdmin() || isTreasurer()) && isValidIncome(incoming()) && incoming().createdBy == request.auth.uid && isValidId(incomeId);
+      allow update: if isVerified() && (isAdmin() || isTreasurer()) && isValidIncome(incoming()) && isValidId(incomeId);
+      allow delete: if isVerified() && (isAdmin() || isTreasurer());
+    }
+
+    // --- 6. EXPENSES DIRECT REGISTER ---
+    function isValidExpense(data) {
+      return data.keys().hasAll(['id', 'categoryId', 'categoryName', 'amount', 'paymentMethod', 'date', 'createdBy']) &&
+             data.amount is number && data.amount > 0 &&
+             data.paymentMethod in ['Bank', 'Mobile Money', 'Cash'] &&
+             data.categoryId is string && data.categoryName is string &&
+             data.createdBy is string;
+    }
+
+    match /expenses/{expenseId} {
+      allow read: if isVerified();
+      allow create: if isVerified() && (isAdmin() || isTreasurer()) && isValidExpense(incoming()) && incoming().createdBy == request.auth.uid && isValidId(expenseId);
+      allow update: if isVerified() && (isAdmin() || isTreasurer()) && isValidExpense(incoming()) && isValidId(expenseId);
+      allow delete: if isVerified() && (isAdmin() || isTreasurer());
+    }
+
+    // --- 7. PLEDGES AUDIT GATES ---
+    function isValidPledge(data) {
+      return data.keys().hasAll(['id', 'memberId', 'memberName', 'amount', 'amountPaid', 'remainingBalance', 'dueDate', 'status']) &&
+             data.amount is number && data.amount > 0 &&
+             data.amountPaid is number && data.amountPaid >= 0 &&
+             data.remainingBalance is number && data.remainingBalance >= 0 &&
+             data.status in ['Pending', 'Partially Paid', 'Fully Paid', 'Overdue'];
+    }
+
+    match /pledges/{pledgeId} {
+      allow read: if isVerified();
+      allow create: if isVerified() && (isAdmin() || isTreasurer() || isSecretary()) && isValidPledge(incoming()) && isValidId(pledgeId);
+      allow update: if isVerified() && (isAdmin() || isTreasurer() || isSecretary()) && isValidPledge(incoming()) && isValidId(pledgeId);
+      allow delete: if isVerified() && (isAdmin() || isTreasurer());
+    }
+
+    // --- 8. PROJECTS COVENS ---
+    function isValidProject(data) {
+      return data.keys().hasAll(['id', 'name', 'budget', 'incomeReceived', 'expensesSpent', 'remainingBalance', 'status']) &&
+             data.budget is number && data.budget > 0 &&
+             data.status in ['Planning', 'Active', 'Completed', 'Suspended'];
+    }
+
+    match /projects/{projectId} {
+      allow read: if isVerified();
+      allow create, update: if isVerified() && (isAdmin() || isTreasurer()) && isValidProject(incoming()) && isValidId(projectId);
+      allow delete: if isVerified() && (isAdmin() || isTreasurer());
+    }
+
+    // --- 9. CASHBOOK LEDGER (Read only stream) ---
+    match /cashbook/{cashbookId} {
+      allow read: if isVerified();
+      allow write: if false; // Cashbook entries are created server-side or recalculated based of transaction rules.
+    }
+
+    // --- 10. SYSTEM GENERAL AUDIT TRAILS ---
+    match /auditLogs/{logId} {
+      allow read: if isVerified() && (isAdmin() || isAuditor());
+      allow create: if isVerified() && incoming().performedBy == request.auth.uid;
+      allow update, delete: if false; // System audit logs are immutable, strictly write-once.
+    }
+  }
+}
