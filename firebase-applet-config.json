@@ -1,10 +1,10 @@
 {
-  "projectId": "silken-cycling-cfbwx",
-  "appId": "1:431051646575:web:ee982ab34ab50ffc77cf9a",
-  "apiKey": "AIzaSyBdrdkkT9zhT0vgtEwVhOllAy07jOEnsHw",
-  "authDomain": "silken-cycling-cfbwx.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-094a7c38-48bd-4140-bed6-258eaafdca17",
-  "storageBucket": "silken-cycling-cfbwx.firebasestorage.app",
-  "messagingSenderId": "431051646575",
+  "projectId": "treasure-system",
+  "appId": "1:657311716192:web:185c05e32dc533e1f94405",
+  "apiKey": "AIzaSyCdf5r2Sj5lOpZlD9k7aOy8pROA-X8Vdls",
+  "authDomain": "treasure-system.firebaseapp.com",
+  "firestoreDatabaseId": "",
+  "storageBucket": "treasure-system.firebasestorage.app",
+  "messagingSenderId": "657311716192",
   "measurementId": ""
 }

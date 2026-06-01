@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/// <reference types="vite/client" />
+
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
@@ -41,20 +43,40 @@ let db: any = null;
 let auth: any = null;
 let storage: any = null;
 
+// Consolidate config from environment variables (for production hosting like Vercel) and the default file fallback
+const rawAuthDomain = import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfig?.authDomain || "";
+const cleanedAuthDomain = rawAuthDomain
+  ? rawAuthDomain.replace(/^https?:\/\//i, '').split('/')[0]
+  : "";
+
+const resolvedConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || firebaseConfig?.apiKey || "",
+  authDomain: cleanedAuthDomain,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || firebaseConfig?.projectId || "",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || firebaseConfig?.storageBucket || "",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || firebaseConfig?.messagingSenderId || "",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || firebaseConfig?.appId || "",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || firebaseConfig?.measurementId || "",
+  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_DATABASE_ID || import.meta.env.VITE_FIREBASE_FIRESTORE_DATABASE_ID || firebaseConfig?.firestoreDatabaseId || "",
+};
+
 // Determine if config is validly populated
-if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== "") {
+if (resolvedConfig.apiKey && resolvedConfig.apiKey !== "") {
   try {
     if (getApps().length === 0) {
-      app = initializeApp(firebaseConfig);
+      app = initializeApp(resolvedConfig);
     } else {
       app = getApp();
     }
     // As per the skill mandate: The app will break without firestoreDatabaseId if configured
-    db = getFirestore(app, firebaseConfig.firestoreDatabaseId || undefined);
+    db = getFirestore(app, resolvedConfig.firestoreDatabaseId || undefined);
     auth = getAuth(app);
     storage = getStorage(app);
     firebaseAvailable = true;
-    console.log("Firebase initialized successfully with config.");
+    console.log("Firebase initialized successfully with configuration.", {
+      projectId: resolvedConfig.projectId,
+      databaseId: resolvedConfig.firestoreDatabaseId || "(default)"
+    });
     
     // Validate Connection to Firestore on startup as mandated by security skill
     const testConnection = async () => {
@@ -71,7 +93,7 @@ if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== "") {
     console.error("Firebase failed to initialize:", error);
   }
 } else {
-  console.log("Using Local Storage Fallback Mode - No apiKey in firebase-applet-config.json");
+  console.log("Using Local Storage Fallback Mode - No apiKey resolved in environment or firebase-applet-config.json");
 }
 
 export { app, db, auth, storage, firebaseAvailable };
